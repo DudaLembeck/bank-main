@@ -192,6 +192,15 @@ O cliente é criado uma única vez em `src/services/supabase.ts` e importado pel
 | `src/views/CadastroPage.vue` | cadastro com dois modos (ALUNO / COMISSÃO), campo de código só no modo comissão, pede nome completo, senha e e-mail |
 | `src/components/CartaoFormulario.vue` | cartão branco + cartão rosa interno dos formulários |
 | `src/components/MarcaTopo.vue`, `TituloSecao.vue` | cabeçalho da marca e título `—— SEÇÃO ——` |
+| `src/components/CabecalhoApp.vue` | cabeçalho de todas as telas internas: perfil, sino, "Bem vindo(a), {nome}", logo |
+| `src/components/PilulasNavegacao.vue` | pílulas brancas do topo; recebe o grupo (`anuncios`, `posts`, `galeria`, `simples`) e mostra as outras telas |
+| `src/services/dinheiro.ts` | `paraCentavos`, `formatarReal`, `formatarComSinal`, `formatarData` |
+| `src/services/caixaService.ts` | `buscarSaldo`, `listarMovimentacoes` (com autor e evento), `registrarMovimentacao` (RPC) |
+| `src/services/eventoService.ts` | `listarEventos`, `criarEvento`, `alternarEncerrado` |
+| `src/stores/caixa.ts` | saldo, extrato e `lancar()` |
+| `src/views/ExtratoPage.vue` | saldo, lista de movimentações e, só para comissão, os botões ADICIONAR e RETIRAR, que abrem o modal de lançamento (valor, evento opcional, motivo obrigatório) com confirmação. Retirada acima do saldo é barrada na tela e, de novo, pelo banco |
+| `src/views/EventosPage.vue` | cadastro e lista de dias D e eventos (cadastro só para comissão) |
+| `src/views/{Anuncios,Posts,Galeria,Notificacoes,Perfil}Page.vue` | **esqueletos**: só cabeçalho, pílulas e título; conteúdo ainda não construído |
 | `src/router/index.ts` | rotas com lazy loading + guard `requerLogin` / `somenteVisitante` |
 
 `HomePage.vue` ainda é a tela do template, só ligada à sessão (mostra o nome, o papel e um botão de sair) — a tela real do protótipo ainda não foi feita.

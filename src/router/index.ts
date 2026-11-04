@@ -24,6 +24,48 @@ const routes: Array<RouteRecordRaw> = [
     name: 'home',
     component: () => import('../views/HomePage.vue'),
     meta: { requerLogin: true }
+  },
+  {
+    path: '/extrato',
+    name: 'extrato',
+    component: () => import('../views/ExtratoPage.vue'),
+    meta: { requerLogin: true }
+  },
+  {
+    path: '/eventos',
+    name: 'eventos',
+    component: () => import('../views/EventosPage.vue'),
+    meta: { requerLogin: true }
+  },
+  {
+    path: '/anuncios',
+    name: 'anuncios',
+    component: () => import('../views/AnunciosPage.vue'),
+    meta: { requerLogin: true }
+  },
+  {
+    path: '/posts',
+    name: 'posts',
+    component: () => import('../views/PostsPage.vue'),
+    meta: { requerLogin: true }
+  },
+  {
+    path: '/galeria',
+    name: 'galeria',
+    component: () => import('../views/GaleriaPage.vue'),
+    meta: { requerLogin: true }
+  },
+  {
+    path: '/notificacoes',
+    name: 'notificacoes',
+    component: () => import('../views/NotificacoesPage.vue'),
+    meta: { requerLogin: true }
+  },
+  {
+    path: '/perfil',
+    name: 'perfil',
+    component: () => import('../views/PerfilPage.vue'),
+    meta: { requerLogin: true }
   }
 ]
 
