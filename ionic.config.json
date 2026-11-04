@@ -1,0 +1,7 @@
+{
+  "name": "bbank",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
