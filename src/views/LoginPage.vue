@@ -46,7 +46,7 @@
           <span v-else>ENTRAR</span>
         </ion-button>
 
-        <button class="link" type="button" @click="avisarRecuperacao">
+        <button class="link" type="button" @click="router.push('/recuperar-senha')">
           esqueceu sua senha?
         </button>
       </CartaoFormulario>
@@ -71,7 +71,6 @@ import {
   IonList,
   IonPage,
   IonSpinner,
-  toastController,
   useIonRouter
 } from '@ionic/vue'
 import CartaoFormulario from '../components/CartaoFormulario.vue'
@@ -116,15 +115,6 @@ async function autenticar() {
   } finally {
     carregando.value = false
   }
-}
-
-async function avisarRecuperacao() {
-  const aviso = await toastController.create({
-    message: 'Recuperação de senha ainda não está disponível.',
-    duration: 2500,
-    color: 'medium'
-  })
-  await aviso.present()
 }
 </script>
 

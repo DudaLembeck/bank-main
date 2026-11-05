@@ -14,6 +14,8 @@ Cada etapa tem: o que construir, de que depende, e **como saber que ficou pronta
 
 **Etapas 1 e 2 construídas** — compilam e passam no lint e no build, mas **ainda sem teste com conta logada**: cabeçalho, pílulas, extrato com lançamento da comissão e tela de eventos. A tela de eventos não estava no plano original; entrou por decisão da Maria, para o lançamento poder apontar para um dia D. A próxima etapa é a **3** (Home), depois a **4** (Avisos).
 
+**Etapas 5, 6 e 7 construídas em 05/11/2026**, sem teste com conta logada: câmera e Storage, galeria com envio e exclusão, posts com até 4 fotos e exclusão, e a recuperação de senha por código (que não estava no plano original). **Curtidas** ficaram de fora e entram junto com as notificações, na etapa 9.
+
 ---
 
 ## Como cada tela é construída
@@ -131,7 +133,7 @@ Tela `/anuncios` com a lista; o formulário de publicar aparece **só** se `ehCo
 
 ---
 
-## Etapa 5 — Fotos: câmera e Storage
+## Etapa 5 — Fotos: câmera e Storage (CONSTRUÍDA, falta testar no navegador logado)
 
 A parte que mais dá trabalho, por isso vem antes dos posts, que dependem dela.
 
@@ -144,7 +146,7 @@ A parte que mais dá trabalho, por isso vem antes dos posts, que dependem dela.
 
 ---
 
-## Etapa 6 — Galeria
+## Etapa 6 — Galeria (CONSTRUÍDA, falta testar logado)
 
 Tela `/galeria` com os cards de foto e legenda ("Terceiro 2 - Turma de 2023"), e botão de enviar foto para qualquer pessoa logada.
 
@@ -154,7 +156,7 @@ Tela `/galeria` com os cards de foto e legenda ("Terceiro 2 - Turma de 2023"), e
 
 ---
 
-## Etapa 7 — Posts e curtidas
+## Etapa 7 — Posts e curtidas (POSTS CONSTRUÍDOS; curtidas pendentes)
 
 **Serviço** `postService.ts`: `listar()` trazendo autor e imagens, `publicar(texto, caminhos[])` gravando `post` + `post_imagem` com `ordem`, `remover(id)`.
 
@@ -222,7 +224,7 @@ Depois: ícone e splash, `appId` de verdade no `capacitor.config.ts` (o template
 Estão nos requisitos ou no protótipo, mas não bloqueiam nada:
 
 - **Aba Dúvidas** (RF008, RF012–RF014) — tabelas prontas, tela não existe, não aparece em nenhum print.
-- **"Esqueceu sua senha?"** — viável com `resetPasswordForEmail`, mas é um fluxo inteiro de e-mail.
+- ~~**"Esqueceu sua senha?"**~~ — construída, por código de 6 dígitos. Falta configurar o template do e-mail e um SMTP próprio para os alunos (ver o contexto).
 - **Tela de gerenciar comissão** — promover alguém depois do cadastro. Hoje é SQL na mão.
 - **Menções `@fulano`** nos posts.
 - **Filtro por evento/dia D** com `IonChip` — o banco já suporta (`id_evento`), falta a tela.

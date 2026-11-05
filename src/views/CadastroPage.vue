@@ -22,13 +22,6 @@
         </ion-button>
       </div>
 
-      <p class="explicacao">
-        {{
-          modo === 'aluno'
-            ? 'Conta de aluno: vê o caixa, publica posts e fotos.'
-            : 'Conta da comissão: movimenta o caixa e publica avisos. Exige o código da comissão.'
-        }}
-      </p>
 
       <CartaoFormulario titulo="SUAS INFORMAÇÕES">
         <ion-list lines="none" class="campos">

@@ -20,6 +20,12 @@ const routes: Array<RouteRecordRaw> = [
     meta: { somenteVisitante: true }
   },
   {
+    path: '/recuperar-senha',
+    name: 'recuperar-senha',
+    component: () => import('../views/RecuperarSenhaPage.vue'),
+    meta: { somenteVisitante: true }
+  },
+  {
     path: '/home',
     name: 'home',
     component: () => import('../views/HomePage.vue'),

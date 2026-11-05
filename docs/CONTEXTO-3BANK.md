@@ -200,7 +200,14 @@ O cliente é criado uma única vez em `src/services/supabase.ts` e importado pel
 | `src/stores/caixa.ts` | saldo, extrato e `lancar()` |
 | `src/views/ExtratoPage.vue` | saldo, lista de movimentações e, só para comissão, os botões ADICIONAR e RETIRAR, que abrem o modal de lançamento (valor, evento opcional, motivo obrigatório) com confirmação. Retirada acima do saldo é barrada na tela e, de novo, pelo banco |
 | `src/views/EventosPage.vue` | cadastro e lista de dias D e eventos (cadastro só para comissão) |
-| `src/views/{Anuncios,Posts,Galeria,Notificacoes,Perfil}Page.vue` | **esqueletos**: só cabeçalho, pílulas e título; conteúdo ainda não construído |
+| `src/composables/useCamera.ts` | captura de foto (Camera API, `DataUrl`, `webUseInput` no navegador), cancelamento tratado em silêncio |
+| `src/services/imagemService.ts` | `enviarImagem` (Storage), `urlPublica`, `removerImagens` |
+| `src/services/postService.ts` | `listarPosts` (com autor, evento e imagens), `publicarPost` (envia fotos, grava post e imagens, desfaz se falhar), `removerPost` |
+| `src/services/galeriaService.ts` | `listarFotos`, `enviarFoto`, `removerFoto` |
+| `src/views/PostsPage.vue` | lista de posts com fotos e modal de novo post (texto, evento opcional, até 4 fotos); apaga o próprio post, e a comissão apaga qualquer um |
+| `src/views/GaleriaPage.vue` | fotos com legenda "Turma - Turma de ANO", modal de envio (foto, turma, ano, legenda, evento opcional); mesma regra de apagar |
+| `src/views/RecuperarSenhaPage.vue` | recuperação de senha em duas etapas: pede o e-mail e depois código + nova senha |
+| `src/views/{Anuncios,Notificacoes,Perfil}Page.vue` | **esqueletos**: só cabeçalho, pílulas e título; conteúdo ainda não construído |
 | `src/router/index.ts` | rotas com lazy loading + guard `requerLogin` / `somenteVisitante` |
 
 `HomePage.vue` ainda é a tela do template, só ligada à sessão (mostra o nome, o papel e um botão de sair) — a tela real do protótipo ainda não foi feita.
@@ -215,10 +222,13 @@ Migrações, aplicadas no servidor e versionadas em `supabase/migrations/`:
 | `...0004_storage.sql` | buckets `perfis`, `posts`, `galeria` |
 | `...0005_codigo_comissao.sql` | tabela de códigos + gatilho que concede `is_admin` |
 | `...0006_nome_usuario_completo.sql` | afrouxa o `check` de `nome_usuario` para caber nome completo |
+| `...0007_storage_comissao_apaga.sql` | a comissão também pode apagar arquivos de imagem enviados por outras pessoas (antes só o dono). **Precisa ser executada no SQL Editor** |
 
 ### Configuração do painel (não é migração)
 
 - **Confirm email**: desligado em *Authentication → Sign In / Providers → Email*, para o cadastro já criar sessão. Consequência aceita: ninguém prova ser dono do e-mail informado.
+- **Template de e-mail "Reset Password"** (Authentication → Emails): precisa conter `{{ .Token }}`, que é o código de 6 dígitos. Sem isso o e-mail só traz o link e a tela de recuperação não funciona. Exemplo de corpo: `<h2>Redefinir sua senha no 3BANK</h2><p>Seu código de verificação é:</p><h1>{{ .Token }}</h1><p>Digite esse código no app. Se não foi você, ignore este e-mail.</p>`
+- **SMTP**: o serviço de e-mail padrão do Supabase recusa entregar para endereços que não sejam do time do projeto e limita a 2 mensagens por hora (documentação oficial, conferida em 05/11/2026). Serve para testar com o e-mail do próprio dono; para os alunos é preciso configurar SMTP próprio em Authentication → Emails → SMTP Settings. Com SMTP próprio o limite padrão sobe para 30 por hora.
 - **Código da comissão**: o valor real é definido por `update codigo_comissao set ativo = false;` seguido de `insert into codigo_comissao (codigo) values ('<codigo>');`. O provisório `TROQUE-ESTE-CODIGO` precisa estar desativado.
 
 ### Regras
@@ -592,7 +602,7 @@ Todas repetem o mesmo cabeçalho: ícone de perfil, sino de notificações, "Bem
 
 | Rota | Tela | Conteúdo |
 | --- | --- | --- |
-| `/login` | Login | card branco flutuante, campos *email* e *senha*, botão **ENTRAR**, link "esqueceu sua senha?" (sem função ainda) |
+| `/login` | Login | card branco flutuante, campos *email* e *senha*, botão **ENTRAR**, link "esqueceu sua senha?" que leva a `/recuperar-senha` |
 | `/cadastro` | Crie sua conta | botões ALUNO / COMISSÃO, card "SUAS INFORMAÇÕES" com *nome completo*, *senha*, *email* e — só no modo comissão — *código da comissão* |
 | `/home` | Início | card com o **total do caixa** (`Saldo: R$ 1234,56` + olho de ocultar + "Ver extrato"), card-imagem "GALERIA DE TURMAS", "Quadro de Anúncios" com o último aviso e "Ver tudo", divisor "ATUALIZAÇÕES", card "Posts" |
 | `/anuncios` | Anúncios | pílulas (INÍCIO / POSTS / GALERIA), avisos da comissão, curtir e enviar, rodapé "sem novos anúncios". **Só admin publica** |
@@ -675,6 +685,10 @@ Faltam requisitos para notificações, curtidas, obrigatoriedade da descrição 
 10. **O login é por e-mail e senha**, não por nome de usuário. O protótipo mostra três campos no login, mas o Supabase Auth autentica por e-mail; entrar pelo nome exigiria uma função aberta a quem não está logado traduzindo usuário → e-mail, o que permitiria descobrir quem existe na turma.
 11. **O nome de usuário É o nome completo do aluno.** Não existe apelido separado: o cadastro pede só *nome completo*, e esse valor vai para `perfil.nome` e `perfil.nome_usuario`. Consequência: `nome_usuario` é `unique`, então **dois alunos homônimos não conseguem se cadastrar**, e o `@` do protótipo exibe o nome por extenso.
 12. **Existem dois tipos de cadastro: aluno e comissão**, escolhidos por dois botões na tela, com o código da comissão validado pelo banco (ver seção 6).
+13. **A recuperação de senha é por código de 6 dígitos enviado por e-mail, não por link.** Fluxo: `resetPasswordForEmail(email)` → o aluno digita o código no app → `verifyOtp({ email, token, type: 'recovery' })` cria a sessão → `updateUser({ password })` grava a nova senha. Motivo: num app Capacitor um link abriria o navegador do celular, não o app, e exigiria deep link. Requer que o template **Reset Password** do Supabase mostre `{{ .Token }}` (ver a seção de configuração do painel). A resposta é a mesma exista ou não conta com o e-mail, para não revelar quem tem cadastro.
+14. **Fotos: até 4 por post, redimensionadas na captura** (`width: 1000`, `quality: 85`), enviadas ao Storage com o caminho `{id_do_usuario}/{timestamp}-{sufixo}.jpg`. Se o envio de uma foto, a criação do post ou o registro das imagens falhar, o que já foi enviado é desfeito. Isso é feito no cliente, em chamadas separadas, porque o supabase-js não tem transação — pode sobrar um arquivo órfão se a rede cair no meio do desfazer.
+15. **Posts e fotos da galeria podem ser apagados pelo dono e pela comissão.** O banco confirma a exclusão: se a RLS recusar, o serviço avisa em vez de fingir que apagou.
+16. **Curtidas ainda não existem na interface**, embora a tabela esteja pronta. Ficam para quando as notificações forem feitas, porque apagar um post precisa limpar também as curtidas dele.
 
 ---
 
@@ -691,7 +705,7 @@ Faltam requisitos para notificações, curtidas, obrigatoriedade da descrição 
 9. **Aba "Dúvidas".** Está nos requisitos e não aparece em nenhum print. Tabelas prontas, tela não existe.
 10. **Comissão que sai.** `id_admin` está com `on delete restrict`. Alternativa: desativar a conta (`perfil.ativo`).
 11. **Galeria por turma.** `turma` e `ano` são texto repetido em cada foto. Se guardar vários terceirões, vale a tabela `turma`.
-12. **"Esqueceu sua senha?"** — viável com `resetPasswordForEmail`. Decidir se entra no escopo.
+12. **E-mail de recuperação de senha para alunos.** A recuperação está construída (ver decisão 13), mas o e-mail padrão do Supabase só entrega a membros do time do projeto e tem limite de 2 mensagens por hora. Para os alunos receberem o código é preciso configurar um SMTP próprio.
 13. **Menções `@fulano`** no texto do post: interpretar na exibição ou criar tabela `mencao`.
 14. **Olho de ocultar o total:** estado da tela, a não ser que precise sobreviver ao fechar o app.
 15. **Pílulas no topo × `IonTabs`.** Decidir antes de criar as telas — muda a estrutura de rotas.

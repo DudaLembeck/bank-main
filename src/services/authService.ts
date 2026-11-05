@@ -21,7 +21,13 @@ const traducoes: [string, string][] = [
   ['duplicate key value', 'Já existe uma conta com esse nome completo.'],
   ['Failed to fetch', 'Sem conexão com a internet.'],
   ['NetworkError', 'Sem conexão com a internet.'],
-  ['over_email_send_rate_limit', 'Muitas tentativas. Espere alguns minutos.']
+  ['over_email_send_rate_limit', 'Muitas tentativas. Espere alguns minutos.'],
+  ['Token has expired or is invalid', 'Código inválido ou expirado.'],
+  ['otp_expired', 'Código inválido ou expirado.'],
+  ['New password should be different', 'A nova senha precisa ser diferente da atual.'],
+  ['you can only request this after', 'Aguarde alguns segundos antes de pedir outro código.'],
+  ['email rate limit exceeded', 'Limite de e-mails atingido. Tente de novo mais tarde.'],
+  ['Error sending recovery email', 'Não foi possível enviar o e-mail. Confira a configuração de e-mail do projeto.']
 ]
 
 function traduzirErro(mensagem: string): string {
@@ -87,4 +93,25 @@ export function observarSessao(aoMudar: (sessao: Session | null) => void) {
     aoMudar(sessao)
   })
   return () => data.subscription.unsubscribe()
+}
+
+export async function pedirCodigoRecuperacao(email: string): Promise<void> {
+  const { error } = await supabase.auth.resetPasswordForEmail(email.trim())
+  if (error) throw new Error(traduzirErro(error.message))
+}
+
+export async function redefinirSenha(
+  email: string,
+  codigo: string,
+  novaSenha: string
+): Promise<void> {
+  const { error: erroCodigo } = await supabase.auth.verifyOtp({
+    email: email.trim(),
+    token: codigo.trim(),
+    type: 'recovery'
+  })
+  if (erroCodigo) throw new Error(traduzirErro(erroCodigo.message))
+
+  const { error } = await supabase.auth.updateUser({ password: novaSenha })
+  if (error) throw new Error(traduzirErro(error.message))
 }

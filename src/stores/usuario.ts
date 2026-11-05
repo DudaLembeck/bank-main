@@ -7,6 +7,8 @@ import {
   cadastrar as cadastrarNoSupabase,
   entrar as entrarNoSupabase,
   observarSessao,
+  pedirCodigoRecuperacao as pedirCodigoNoSupabase,
+  redefinirSenha as redefinirSenhaNoSupabase,
   sair as sairDoSupabase,
   type Perfil
 } from '../services/authService'
@@ -66,6 +68,15 @@ export const useUsuarioStore = defineStore('usuario', () => {
     return { entrouDireto: sessao !== null, virouComissao: ehComissao.value }
   }
 
+  async function pedirCodigo(email: string) {
+    await pedirCodigoNoSupabase(email)
+  }
+
+  async function redefinirSenha(email: string, codigo: string, novaSenha: string) {
+    await redefinirSenhaNoSupabase(email, codigo, novaSenha)
+    await aplicarSessao(await buscarSessao())
+  }
+
   async function sair() {
     await sairDoSupabase()
     await aplicarSessao(null)
@@ -81,6 +92,8 @@ export const useUsuarioStore = defineStore('usuario', () => {
     inicializar,
     entrar,
     cadastrar,
+    pedirCodigo,
+    redefinirSenha,
     sair
   }
 })
