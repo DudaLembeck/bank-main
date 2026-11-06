@@ -295,6 +295,7 @@ async function alternar(anuncio: Anuncio) {
 async function confirmarRemocao(anuncio: Anuncio) {
   const alerta = await alertController.create({
     header: 'Apagar anúncio?',
+    cssClass: 'alerta-perigo',
     message: 'Os alunos deixam de ver esse aviso.',
     buttons: [
       { text: 'Cancelar', role: 'cancel' },

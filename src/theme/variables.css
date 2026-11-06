@@ -70,4 +70,48 @@ http://ionicframework.com/docs/theming/ */
   --ion-background-color:  #bd9cad;
   --ion-toolbar-background: #f7c4d6 ;
   --ion-item-background: #fff;
+  --ion-overlay-background-color: #ffffff;
+}
+
+ion-alert {
+  --background: #ffffff;
+  --backdrop-opacity: 0.5;
+}
+
+ion-alert .alert-wrapper {
+  border-radius: 20px;
+}
+
+ion-alert .alert-wrapper .alert-title {
+  color: var(--ion-color-tertiary);
+  font-weight: 700;
+}
+
+ion-alert .alert-wrapper .alert-message {
+  color: #3d3d3d;
+  font-size: 15px;
+}
+
+ion-alert .alert-wrapper .alert-button {
+  color: var(--ion-color-tertiary);
+  font-weight: 700;
+}
+
+ion-alert .alert-button.alert-button-role-cancel {
+  color: #5f5f5f;
+}
+
+ion-alert.alerta-perigo .alert-button.alert-button-role-confirm {
+  color: var(--ion-color-danger);
+}
+
+ion-action-sheet {
+  --background: #ffffff;
+  --button-color: var(--ion-color-tertiary);
+  --color: #3d3d3d;
+  --backdrop-opacity: 0.5;
+}
+
+ion-action-sheet .action-sheet-container .action-sheet-title {
+  color: var(--ion-color-tertiary);
 }

@@ -168,7 +168,7 @@ Tela `/galeria` com os cards de foto e legenda ("Terceiro 2 - Turma de 2023"), e
 
 ---
 
-## Etapa 8 — Perfil
+## Etapa 8 — Perfil (CONSTRUÍDA, falta testar logado)
 
 Tela `/perfil`: avatar grande (trocável pela câmera), nome completo, salvar alterações.
 

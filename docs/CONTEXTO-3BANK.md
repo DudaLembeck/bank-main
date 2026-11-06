@@ -209,7 +209,9 @@ O cliente é criado uma única vez em `src/services/supabase.ts` e importado pel
 | `src/views/RecuperarSenhaPage.vue` | recuperação de senha em duas etapas: pede o e-mail e depois código + nova senha |
 | `src/services/anuncioService.ts` | `listarAnuncios` (fixados primeiro, depois os mais novos), `publicarAnuncio`, `alternarFixado`, `removerAnuncio` |
 | `src/views/AnunciosPage.vue` | lista de avisos para todos; só a comissão vê NOVO ANÚNCIO (texto, evento opcional, fixar no topo) e os botões de fixar e apagar |
-| `src/views/{Notificacoes,Perfil}Page.vue` | **esqueletos**: só cabeçalho, pílulas e título; conteúdo ainda não construído |
+| `src/services/perfilService.ts` | `atualizarFotoPerfil`: envia a foto ao bucket `perfis`, grava o caminho em `perfil.foto_perfil` e apaga a foto antiga (desfaz o envio se a gravação falhar) |
+| `src/views/PerfilPage.vue` | avatar grande, selo Aluno/Comissão, nome, e-mail, tipo de conta e "membro desde" (somente leitura), TROCAR FOTO, REDEFINIR SENHA (pede a senha atual) e SAIR |
+| `src/views/NotificacoesPage.vue` | **esqueleto**: só cabeçalho, pílulas e título; conteúdo ainda não construído |
 | `src/router/index.ts` | rotas com lazy loading + guard `requerLogin` / `somenteVisitante` |
 
 `HomePage.vue` ainda é a tela do template, só ligada à sessão (mostra o nome, o papel e um botão de sair) — a tela real do protótipo ainda não foi feita.
@@ -694,6 +696,9 @@ Faltam requisitos para notificações, curtidas, obrigatoriedade da descrição 
 
 17. **Na galeria, a legenda fica sobre a foto**, em branco com sombra e um degradê escuro embaixo, para ler bem em qualquer imagem. A foto tem altura fixa de 320px e é cortada para preencher (`object-fit: cover`, aplicado pela `::part(image)` do `ion-img`, porque `object-fit` no próprio `ion-img` não atinge a imagem interna). O mesmo corte vale para a grade dos posts.
 18. **A Home mostra o Quadro de anúncios** com os 2 avisos mais recentes (fixados primeiro) e o link "Ver tudo". Anúncio automático de retirada (RF010) ainda não existe.
+19. **O perfil mostra os dados da conta sem permitir editá-los**: nome e e-mail são só leitura (a RLS também só libera `nome_usuario`, `nome` e `foto_perfil` para atualização, nunca `is_admin`). O que o usuário altera é a **foto** e a **senha**. A foto aparece também no ícone de perfil do cabeçalho.
+20. **A senha é trocada dentro do app confirmando a senha atual**: o app confere a atual com `signInWithPassword` e só então chama `updateUser({ password })`. Assim uma pessoa com o celular desbloqueado não troca a senha sem conhecê-la, e não gasta e-mail (o limite do SMTP é baixo). O fluxo por código de e-mail continua só para quem esqueceu a senha.
+21. **Diálogos e action sheets têm fundo branco e texto escuro**, definidos em `src/theme/variables.css`. O fundo geral do tema é `#bd9cad`, e os overlays o herdavam, deixando os botões rosa quase invisíveis. A variável `--ion-overlay-background-color` troca o fundo, e os seletores de texto precisam de mais especificidade que os do Ionic. Diálogos de apagar usam `cssClass: 'alerta-perigo'`, que deixa o botão Apagar vermelho.
 
 ---
 

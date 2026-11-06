@@ -297,6 +297,7 @@ async function publicar() {
 async function confirmarRemocao(post: Post) {
   const alerta = await alertController.create({
     header: 'Apagar post?',
+    cssClass: 'alerta-perigo',
     message: 'Essa ação não pode ser desfeita.',
     buttons: [
       { text: 'Cancelar', role: 'cancel' },

@@ -46,9 +46,15 @@
           <span v-else>ENTRAR</span>
         </ion-button>
 
-        <button class="link" type="button" @click="router.push('/recuperar-senha')">
+        <ion-button
+          class="link"
+          fill="clear"
+          size="small"
+          expand="block"
+          router-link="/recuperar-senha"
+        >
           esqueceu sua senha?
-        </button>
+        </ion-button>
       </CartaoFormulario>
 
       <div class="rodape">
@@ -137,15 +143,17 @@ ion-button {
   margin-top: 10px;
 }
 
-.link {
-  display: block;
-  width: 100%;
-  margin-top: 2px;
-  background: none;
-  border: none;
-  font-size: 12px;
-  color: #8c8c8c;
-  cursor: pointer;
+ion-button.link {
+  --color: #8c8c8c;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  height: auto;
+  min-height: 48px;
+  margin-top: 20px;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .rodape {

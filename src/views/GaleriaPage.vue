@@ -310,6 +310,7 @@ async function enviar() {
 async function confirmarRemocao(foto: FotoGaleria) {
   const alerta = await alertController.create({
     header: 'Apagar foto?',
+    cssClass: 'alerta-perigo',
     message: 'Essa ação não pode ser desfeita.',
     buttons: [
       { text: 'Cancelar', role: 'cancel' },

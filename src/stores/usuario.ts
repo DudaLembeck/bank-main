@@ -10,11 +10,13 @@ import {
   pedirCodigoRecuperacao as pedirCodigoNoSupabase,
   redefinirSenha as redefinirSenhaNoSupabase,
   sair as sairDoSupabase,
+  trocarSenha as trocarSenhaNoSupabase,
   type Perfil
 } from '../services/authService'
 
 export const useUsuarioStore = defineStore('usuario', () => {
   const perfil = ref<Perfil | null>(null)
+  const email = ref('')
   const temSessao = ref(false)
   const iniciando = ref(true)
 
@@ -25,6 +27,7 @@ export const useUsuarioStore = defineStore('usuario', () => {
 
   async function aplicarSessao(sessao: Session | null) {
     temSessao.value = sessao !== null
+    email.value = sessao?.user.email ?? ''
     if (!sessao) {
       perfil.value = null
       return
@@ -77,6 +80,14 @@ export const useUsuarioStore = defineStore('usuario', () => {
     await aplicarSessao(await buscarSessao())
   }
 
+  async function trocarSenha(senhaAtual: string, novaSenha: string) {
+    await trocarSenhaNoSupabase(email.value, senhaAtual, novaSenha)
+  }
+
+  async function recarregarPerfil() {
+    await aplicarSessao(await buscarSessao())
+  }
+
   async function sair() {
     await sairDoSupabase()
     await aplicarSessao(null)
@@ -84,6 +95,7 @@ export const useUsuarioStore = defineStore('usuario', () => {
 
   return {
     perfil,
+    email,
     iniciando,
     logado,
     ehComissao,
@@ -94,6 +106,8 @@ export const useUsuarioStore = defineStore('usuario', () => {
     cadastrar,
     pedirCodigo,
     redefinirSenha,
+    trocarSenha,
+    recarregarPerfil,
     sair
   }
 })

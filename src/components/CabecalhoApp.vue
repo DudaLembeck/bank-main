@@ -3,7 +3,8 @@
     <ion-toolbar>
       <ion-buttons slot="start">
         <ion-button @click="ir('/perfil')">
-          <ion-icon slot="icon-only" :icon="personCircleOutline" />
+          <img v-if="fotoUrl" slot="icon-only" :src="fotoUrl" class="avatar" alt="perfil" />
+          <ion-icon v-else slot="icon-only" :icon="personCircleOutline" />
         </ion-button>
         <ion-button @click="ir('/notificacoes')">
           <ion-icon slot="icon-only" :icon="notificationsOutline" />
@@ -28,10 +29,18 @@ import {
   useIonRouter
 } from '@ionic/vue'
 import { notificationsOutline, personCircleOutline } from 'ionicons/icons'
+import { computed } from 'vue'
+import { urlPublica } from '../services/imagemService'
 import { useUsuarioStore } from '../stores/usuario'
 
 const usuario = useUsuarioStore()
 const router = useIonRouter()
+
+const fotoUrl = computed(() =>
+  usuario.perfil?.foto_perfil
+    ? urlPublica('perfis', usuario.perfil.foto_perfil)
+    : ''
+)
 
 function ir(caminho: string) {
   router.push(caminho)
@@ -47,6 +56,14 @@ ion-toolbar {
 ion-icon {
   color: var(--ion-color-primary-shade);
   font-size: 26px;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--ion-color-primary);
 }
 
 h4 {

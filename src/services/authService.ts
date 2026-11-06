@@ -115,3 +115,23 @@ export async function redefinirSenha(
   const { error } = await supabase.auth.updateUser({ password: novaSenha })
   if (error) throw new Error(traduzirErro(error.message))
 }
+
+export async function trocarSenha(
+  email: string,
+  senhaAtual: string,
+  novaSenha: string
+): Promise<void> {
+  const { error: erroAtual } = await supabase.auth.signInWithPassword({
+    email,
+    password: senhaAtual
+  })
+  if (erroAtual) {
+    if (erroAtual.message.toLowerCase().includes('invalid login credentials')) {
+      throw new Error('A senha atual está incorreta.')
+    }
+    throw new Error(traduzirErro(erroAtual.message))
+  }
+
+  const { error } = await supabase.auth.updateUser({ password: novaSenha })
+  if (error) throw new Error(traduzirErro(error.message))
+}
