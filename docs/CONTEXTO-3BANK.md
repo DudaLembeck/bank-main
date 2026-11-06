@@ -207,7 +207,9 @@ O cliente é criado uma única vez em `src/services/supabase.ts` e importado pel
 | `src/views/PostsPage.vue` | lista de posts com fotos e modal de novo post (texto, evento opcional, até 4 fotos); apaga o próprio post, e a comissão apaga qualquer um |
 | `src/views/GaleriaPage.vue` | fotos com legenda "Turma - Turma de ANO", modal de envio (foto, turma, ano, legenda, evento opcional); mesma regra de apagar |
 | `src/views/RecuperarSenhaPage.vue` | recuperação de senha em duas etapas: pede o e-mail e depois código + nova senha |
-| `src/views/{Anuncios,Notificacoes,Perfil}Page.vue` | **esqueletos**: só cabeçalho, pílulas e título; conteúdo ainda não construído |
+| `src/services/anuncioService.ts` | `listarAnuncios` (fixados primeiro, depois os mais novos), `publicarAnuncio`, `alternarFixado`, `removerAnuncio` |
+| `src/views/AnunciosPage.vue` | lista de avisos para todos; só a comissão vê NOVO ANÚNCIO (texto, evento opcional, fixar no topo) e os botões de fixar e apagar |
+| `src/views/{Notificacoes,Perfil}Page.vue` | **esqueletos**: só cabeçalho, pílulas e título; conteúdo ainda não construído |
 | `src/router/index.ts` | rotas com lazy loading + guard `requerLogin` / `somenteVisitante` |
 
 `HomePage.vue` ainda é a tela do template, só ligada à sessão (mostra o nome, o papel e um botão de sair) — a tela real do protótipo ainda não foi feita.
@@ -689,6 +691,9 @@ Faltam requisitos para notificações, curtidas, obrigatoriedade da descrição 
 14. **Fotos: até 4 por post, redimensionadas na captura** (`width: 1000`, `quality: 85`), enviadas ao Storage com o caminho `{id_do_usuario}/{timestamp}-{sufixo}.jpg`. Se o envio de uma foto, a criação do post ou o registro das imagens falhar, o que já foi enviado é desfeito. Isso é feito no cliente, em chamadas separadas, porque o supabase-js não tem transação — pode sobrar um arquivo órfão se a rede cair no meio do desfazer.
 15. **Posts e fotos da galeria podem ser apagados pelo dono e pela comissão.** O banco confirma a exclusão: se a RLS recusar, o serviço avisa em vez de fingir que apagou.
 16. **Curtidas ainda não existem na interface**, embora a tabela esteja pronta. Ficam para quando as notificações forem feitas, porque apagar um post precisa limpar também as curtidas dele.
+
+17. **Na galeria, a legenda fica sobre a foto**, em branco com sombra e um degradê escuro embaixo, para ler bem em qualquer imagem. A foto tem altura fixa de 320px e é cortada para preencher (`object-fit: cover`, aplicado pela `::part(image)` do `ion-img`, porque `object-fit` no próprio `ion-img` não atinge a imagem interna). O mesmo corte vale para a grade dos posts.
+18. **A Home mostra o Quadro de anúncios** com os 2 avisos mais recentes (fixados primeiro) e o link "Ver tudo". Anúncio automático de retirada (RF010) ainda não existe.
 
 ---
 

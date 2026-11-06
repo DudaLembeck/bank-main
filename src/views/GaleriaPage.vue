@@ -28,9 +28,9 @@
 
       <template v-else>
         <ion-card v-for="foto in fotos" :key="foto.id" class="foto">
-          <ion-img :src="urlPublica('galeria', foto.caminho)" :alt="legendaDe(foto)" />
-          <ion-card-content>
-            <div class="rodape-foto">
+          <div class="moldura">
+            <ion-img :src="urlPublica('galeria', foto.caminho)" :alt="legendaDe(foto)" />
+            <div class="sobre-foto">
               <div class="textos">
                 <strong v-if="tituloDe(foto)" class="titulo">{{ tituloDe(foto) }}</strong>
                 <p v-if="foto.legenda" class="legenda">{{ foto.legenda }}</p>
@@ -41,15 +41,15 @@
               </div>
               <ion-button
                 v-if="podeApagar(foto)"
+                class="apagar"
                 fill="clear"
                 size="small"
-                color="danger"
                 @click="confirmarRemocao(foto)"
               >
                 <ion-icon slot="icon-only" :icon="trashOutline" />
               </ion-button>
             </div>
-          </ion-card-content>
+          </div>
         </ion-card>
       </template>
 
@@ -154,7 +154,6 @@ import { computed, onMounted, ref } from 'vue'
 import {
   IonButton,
   IonCard,
-  IonCardContent,
   IonContent,
   IonIcon,
   IonImg,
@@ -355,38 +354,74 @@ async function confirmarRemocao(foto: FotoGaleria) {
   box-shadow: 0 5px 16px rgba(155, 34, 98, 0.12);
 }
 
-.foto ion-img {
+.moldura {
+  position: relative;
+  height: 320px;
+  overflow: hidden;
+  background: #2a1f26;
+}
+
+.moldura ion-img {
   display: block;
   width: 100%;
-  max-height: 340px;
+  height: 100%;
+}
+
+.moldura ion-img::part(image) {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
-.rodape-foto {
+.sobre-foto {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-between;
+  gap: 8px;
+  padding: 48px 14px 12px;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.82) 0%,
+    rgba(0, 0, 0, 0.55) 55%,
+    rgba(0, 0, 0, 0) 100%
+  );
 }
 
 .textos {
   flex: 1;
+  min-width: 0;
 }
 
 .titulo {
   display: block;
-  font-size: 14px;
-  color: var(--ion-color-tertiary);
+  font-size: 15px;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 .legenda {
   margin: 2px 0;
   font-size: 13px;
-  color: #4a4a4a;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 .meta {
   font-size: 11px;
-  color: #9a9a9a;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.apagar {
+  --color: #ffffff;
+  --background: rgba(0, 0, 0, 0.35);
+  --border-radius: 50%;
+  margin: 0;
+  flex-shrink: 0;
 }
 
 .escolha {

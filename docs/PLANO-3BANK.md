@@ -109,9 +109,9 @@ export function formatarReal(centavos: number): string {
 
 ---
 
-## Etapa 3 — Tela inicial (PARCIAL: saldo e atalhos prontos)
+## Etapa 3 — Tela inicial (PARCIAL: saldo, atalhos e quadro de anúncios prontos)
 
-Já feito: card do saldo com olho de ocultar e "Ver extrato", e lista de atalhos para extrato, eventos, anúncios, posts e galeria — sem isso não havia caminho para as telas internas. **Falta:** a prévia do último aviso e do último post, que dependem das etapas 4 e 7. O card-imagem "Galeria de turmas" do protótipo virou um atalho comum até existir foto.
+Já feito: card do saldo com olho de ocultar e "Ver extrato", e lista de atalhos para extrato, eventos, anúncios, posts e galeria — sem isso não havia caminho para as telas internas. **Falta:** a prévia do último post. O card-imagem "Galeria de turmas" do protótipo virou um atalho comum até existir foto.
 
 Agora que o saldo existe, a Home tem o que mostrar.
 
@@ -123,7 +123,7 @@ São três consultas pequenas: saldo, último anúncio (`fixado desc, data desc 
 
 ---
 
-## Etapa 4 — Avisos (anúncios)
+## Etapa 4 — Avisos (anúncios) (CONSTRUÍDA, falta testar logado)
 
 **Serviço** `anuncioService.ts`: `listar()`, `publicar(texto, idEvento?)`, `fixar(id, valor)`, `remover(id)`.
 

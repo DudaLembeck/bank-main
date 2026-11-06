@@ -39,6 +39,42 @@
         </ion-card-content>
       </ion-card>
 
+      <TituloSecao texto="Quadro de anúncios" />
+
+      <ion-card class="quadro">
+        <ion-card-content>
+          <ion-spinner v-if="carregandoAnuncios" name="dots" />
+
+          <p v-else-if="erroAnuncios" class="erro">{{ erroAnuncios }}</p>
+
+          <p v-else-if="!anuncios.length" class="sem-anuncios">
+            Sem novos anúncios.
+          </p>
+
+          <template v-else>
+            <div v-for="anuncio in anuncios" :key="anuncio.id" class="aviso">
+              <p class="texto-aviso">
+                <ion-icon v-if="anuncio.fixado" :icon="pin" class="icone-fixado" />
+                {{ anuncio.texto }}
+              </p>
+              <span class="autor-aviso">
+                {{ anuncio.perfil?.nome ?? 'Comissão' }} ·
+                {{ formatarDataHora(anuncio.data) }}
+              </span>
+            </div>
+          </template>
+
+          <ion-button
+            fill="clear"
+            size="small"
+            class="ver-tudo"
+            router-link="/anuncios"
+          >
+            Ver tudo
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+
       <TituloSecao texto="Atalhos" />
 
       <ion-list lines="none" class="atalhos">
@@ -97,10 +133,13 @@ import {
   imagesOutline,
   logOutOutline,
   megaphoneOutline,
+  pin,
   walletOutline
 } from 'ionicons/icons'
 import CabecalhoApp from '../components/CabecalhoApp.vue'
 import TituloSecao from '../components/TituloSecao.vue'
+import { listarAnuncios, type Anuncio } from '../services/anuncioService'
+import { formatarDataHora } from '../services/data'
 import { formatarReal } from '../services/dinheiro'
 import { useCaixaStore } from '../stores/caixa'
 import { useUsuarioStore } from '../stores/usuario'
@@ -111,6 +150,9 @@ const router = useIonRouter()
 
 const oculto = ref(false)
 const carregando = ref(true)
+const anuncios = ref<Anuncio[]>([])
+const carregandoAnuncios = ref(true)
+const erroAnuncios = ref('')
 
 const atalhos = [
   {
@@ -151,7 +193,23 @@ async function carregar() {
   carregando.value = false
 }
 
-onMounted(carregar)
+async function carregarAnuncios() {
+  carregandoAnuncios.value = true
+  erroAnuncios.value = ''
+  try {
+    anuncios.value = await listarAnuncios(2)
+  } catch (e: unknown) {
+    erroAnuncios.value =
+      e instanceof Error ? e.message : 'Erro ao carregar os anúncios.'
+  } finally {
+    carregandoAnuncios.value = false
+  }
+}
+
+onMounted(() => {
+  carregar()
+  carregarAnuncios()
+})
 
 async function encerrarSessao() {
   await usuario.sair()
@@ -198,6 +256,55 @@ async function encerrarSessao() {
 .erro {
   font-size: 13px;
   color: var(--ion-color-danger);
+}
+
+.quadro {
+  margin: 0 16px;
+  border-radius: 18px;
+  box-shadow: 0 5px 16px rgba(155, 34, 98, 0.12);
+}
+
+.aviso {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(155, 34, 98, 0.12);
+}
+
+.aviso:last-of-type {
+  border-bottom: none;
+}
+
+.texto-aviso {
+  margin: 0;
+  font-size: 14px;
+  line-height: 19px;
+  color: #4a4a4a;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.icone-fixado {
+  margin-right: 2px;
+  vertical-align: -2px;
+  color: var(--ion-color-tertiary);
+}
+
+.autor-aviso {
+  font-size: 11px;
+  color: #9a9a9a;
+}
+
+.sem-anuncios {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #9a9a9a;
+}
+
+.ver-tudo {
+  --color: var(--ion-color-tertiary);
+  margin: 6px 0 -6px;
 }
 
 .atalhos {
