@@ -109,7 +109,7 @@ export function formatarReal(centavos: number): string {
 
 ---
 
-## Etapa 3 — Tela inicial (PARCIAL: saldo, atalhos e quadro de anúncios prontos)
+## Etapa 3 — Tela inicial (CONSTRUÍDA, falta testar logado)
 
 Já feito: card do saldo com olho de ocultar e "Ver extrato", e lista de atalhos para extrato, eventos, anúncios, posts e galeria — sem isso não havia caminho para as telas internas. **Falta:** a prévia do último post. O card-imagem "Galeria de turmas" do protótipo virou um atalho comum até existir foto.
 
@@ -156,7 +156,7 @@ Tela `/galeria` com os cards de foto e legenda ("Terceiro 2 - Turma de 2023"), e
 
 ---
 
-## Etapa 7 — Posts e curtidas (POSTS CONSTRUÍDOS; curtidas pendentes)
+## Etapa 7 — Posts e curtidas (CONSTRUÍDA para posts; falta testar logado)
 
 **Serviço** `postService.ts`: `listar()` trazendo autor e imagens, `publicar(texto, caminhos[])` gravando `post` + `post_imagem` com `ordem`, `remover(id)`.
 

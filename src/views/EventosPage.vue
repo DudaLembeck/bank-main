@@ -124,7 +124,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
+import { onIonViewWillEnter } from '@ionic/vue'
 import {
   IonButton,
   IonChip,
@@ -189,7 +190,7 @@ async function carregar() {
   }
 }
 
-onMounted(carregar)
+onIonViewWillEnter(carregar)
 
 async function salvar() {
   tocado.value = true

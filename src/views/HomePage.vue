@@ -75,6 +75,52 @@
         </ion-card-content>
       </ion-card>
 
+      <TituloSecao texto="Atualizações" />
+
+      <BarraNovoPost @abrir="novoPostAberto = true" />
+
+      <div v-if="feed.carregando.value" class="centro-feed">
+        <ion-spinner name="dots" />
+      </div>
+
+      <div v-else-if="feed.erro.value" class="centro-feed">
+        <p class="erro">{{ feed.erro.value }}</p>
+        <ion-button fill="clear" size="small" @click="feed.carregar()">
+          tentar de novo
+        </ion-button>
+      </div>
+
+      <p v-else-if="!feed.posts.value.length" class="sem-posts">
+        Ainda não há posts. Seja a primeira pessoa a publicar!
+      </p>
+
+      <template v-else>
+        <CartaoPost
+          v-for="post in feed.posts.value"
+          :key="post.id"
+          :post="post"
+          :pode-apagar="feed.podeApagar(post)"
+          @curtir="feed.alternarCurtida(post)"
+          @apagar="feed.confirmarRemocao(post)"
+        />
+      </template>
+
+      <ion-button
+        expand="block"
+        fill="outline"
+        class="ver-todos"
+        router-link="/posts"
+      >
+        VER TODOS OS POSTS
+        <ion-icon slot="end" :icon="arrowForwardOutline" />
+      </ion-button>
+
+      <NovoPostModal
+        :aberto="novoPostAberto"
+        @fechar="novoPostAberto = false"
+        @publicado="feed.carregar()"
+      />
+
       <TituloSecao texto="Atalhos" />
 
       <ion-list lines="none" class="atalhos">
@@ -111,7 +157,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import {
   IonButton,
   IonCard,
@@ -123,9 +169,11 @@ import {
   IonList,
   IonPage,
   IonSpinner,
+  onIonViewWillEnter,
   useIonRouter
 } from '@ionic/vue'
 import {
+  arrowForwardOutline,
   calendarOutline,
   chatbubblesOutline,
   eyeOffOutline,
@@ -136,8 +184,12 @@ import {
   pin,
   walletOutline
 } from 'ionicons/icons'
+import BarraNovoPost from '../components/BarraNovoPost.vue'
 import CabecalhoApp from '../components/CabecalhoApp.vue'
+import CartaoPost from '../components/CartaoPost.vue'
+import NovoPostModal from '../components/NovoPostModal.vue'
 import TituloSecao from '../components/TituloSecao.vue'
+import { useFeed } from '../composables/useFeed'
 import { listarAnuncios, type Anuncio } from '../services/anuncioService'
 import { formatarDataHora } from '../services/data'
 import { formatarReal } from '../services/dinheiro'
@@ -148,6 +200,8 @@ const usuario = useUsuarioStore()
 const caixa = useCaixaStore()
 const router = useIonRouter()
 
+const feed = useFeed(3)
+const novoPostAberto = ref(false)
 const oculto = ref(false)
 const carregando = ref(true)
 const anuncios = ref<Anuncio[]>([])
@@ -206,7 +260,8 @@ async function carregarAnuncios() {
   }
 }
 
-onMounted(() => {
+onIonViewWillEnter(() => {
+  feed.carregar()
   carregar()
   carregarAnuncios()
 })
@@ -305,6 +360,27 @@ async function encerrarSessao() {
 .ver-tudo {
   --color: var(--ion-color-tertiary);
   margin: 6px 0 -6px;
+}
+
+.centro-feed {
+  text-align: center;
+  padding: 20px 16px;
+}
+
+.sem-posts {
+  margin: 20px 24px;
+  text-align: center;
+  font-size: 13px;
+  color: #9a9a9a;
+}
+
+.ver-todos {
+  --color: var(--ion-color-tertiary);
+  --border-color: var(--ion-color-tertiary);
+  --border-radius: 14px;
+  margin: 10px 16px 0;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 .atalhos {

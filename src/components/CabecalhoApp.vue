@@ -1,8 +1,8 @@
 <template>
   <ion-header :translucent="true">
     <ion-toolbar>
-      <ion-buttons slot="start">
-        <ion-button @click="ir('/perfil')">
+      <ion-buttons slot="start" class="botoes">
+        <ion-button class="botao-perfil" @click="ir('/perfil')">
           <img v-if="fotoUrl" slot="icon-only" :src="fotoUrl" class="avatar" alt="perfil" />
           <ion-icon v-else slot="icon-only" :icon="personCircleOutline" />
         </ion-button>
@@ -11,7 +11,10 @@
         </ion-button>
       </ion-buttons>
 
-      <h4>Bem vindo(a), {{ usuario.nomeExibicao }}</h4>
+      <div class="saudacao">
+        <span class="ola">Bem vindo(a),</span>
+        <strong class="nome">{{ nomeFormatado }}</strong>
+      </div>
 
       <ion-title slot="end">3BANK</ion-title>
     </ion-toolbar>
@@ -31,6 +34,7 @@ import {
 import { notificationsOutline, personCircleOutline } from 'ionicons/icons'
 import { computed } from 'vue'
 import { urlPublica } from '../services/imagemService'
+import { nomeBonito } from '../services/nome'
 import { useUsuarioStore } from '../stores/usuario'
 
 const usuario = useUsuarioStore()
@@ -42,6 +46,8 @@ const fotoUrl = computed(() =>
     : ''
 )
 
+const nomeFormatado = computed(() => nomeBonito(usuario.nomeExibicao))
+
 function ir(caminho: string) {
   router.push(caminho)
 }
@@ -51,6 +57,16 @@ function ir(caminho: string) {
 ion-toolbar {
   --background: rgb(248, 239, 243);
   --border-width: 0;
+  --min-height: 56px;
+}
+
+.botoes {
+  flex-shrink: 0;
+}
+
+.botoes ion-button {
+  --padding-start: 6px;
+  --padding-end: 6px;
 }
 
 ion-icon {
@@ -59,21 +75,49 @@ ion-icon {
 }
 
 .avatar {
-  width: 30px;
-  height: 30px;
+  display: block;
+  box-sizing: border-box;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--ion-color-primary);
 }
 
-h4 {
-  margin: 0 0 0 4px;
-  font-size: 15px;
-  font-weight: 400;
-  color: rgb(107, 104, 104);
+.saudacao {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: 0 4px;
+}
+
+.ola {
+  font-size: 11px;
+  line-height: 14px;
+  color: #8c8c8c;
+}
+
+.nome {
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  color: #4a4a4a;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 ion-title {
+  flex: 0 0 auto;
+  width: auto;
+  padding: 0 14px 0 6px;
+  font-size: 17px;
   font-weight: 800;
   letter-spacing: 1px;
   color: var(--ion-color-tertiary);

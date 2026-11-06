@@ -145,7 +145,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
+import { onIonViewWillEnter } from '@ionic/vue'
 import {
   IonButton,
   IonCard,
@@ -222,7 +223,7 @@ async function carregar() {
   }
 }
 
-onMounted(async () => {
+onIonViewWillEnter(async () => {
   carregar()
   if (!usuario.ehComissao) return
   try {

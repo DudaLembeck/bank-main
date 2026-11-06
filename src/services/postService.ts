@@ -11,9 +11,11 @@ export interface Post {
   texto: string
   data: string
   id_usuario: string
-  perfil: { nome: string } | null
+  perfil: { nome: string; foto_perfil: string | null; is_admin: boolean } | null
   evento: { nome: string } | null
   post_imagem: PostImagem[]
+  curtidas: number
+  curti: boolean
 }
 
 const traducoes: [string, string][] = [
@@ -30,18 +32,40 @@ function traduzirErro(mensagem: string): string {
   return achado ? achado[1] : `Não foi possível concluir: ${mensagem}`
 }
 
-export async function listarPosts(limite = 30): Promise<Post[]> {
+export async function listarPosts(
+  idUsuario: string | null,
+  limite = 30
+): Promise<Post[]> {
   const { data, error } = await supabase
     .from('post')
     .select(
-      'id, texto, data, id_usuario, perfil(nome), evento(nome), post_imagem(caminho, ordem)'
+      'id, texto, data, id_usuario, perfil(nome, foto_perfil, is_admin), evento(nome), post_imagem(caminho, ordem)'
     )
     .order('data', { ascending: false })
     .limit(limite)
   if (error) throw new Error(traduzirErro(error.message))
 
   const posts = (data ?? []) as unknown as Post[]
-  posts.forEach((p) => p.post_imagem.sort((a, b) => a.ordem - b.ordem))
+  if (!posts.length) return posts
+
+  const { data: curtidas, error: erroCurtidas } = await supabase
+    .from('curtida')
+    .select('alvo_id, id_usuario')
+    .eq('alvo_tipo', 'post')
+    .in(
+      'alvo_id',
+      posts.map((p) => p.id)
+    )
+  if (erroCurtidas) throw new Error(traduzirErro(erroCurtidas.message))
+
+  posts.forEach((post) => {
+    post.post_imagem.sort((a, b) => a.ordem - b.ordem)
+    const doPost = (curtidas ?? []).filter((c) => c.alvo_id === post.id)
+    post.curtidas = doPost.length
+    post.curti = idUsuario
+      ? doPost.some((c) => c.id_usuario === idUsuario)
+      : false
+  })
   return posts
 }
 

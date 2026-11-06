@@ -204,7 +204,14 @@ O cliente é criado uma única vez em `src/services/supabase.ts` e importado pel
 | `src/services/imagemService.ts` | `enviarImagem` (Storage), `urlPublica`, `removerImagens` |
 | `src/services/postService.ts` | `listarPosts` (com autor, evento e imagens), `publicarPost` (envia fotos, grava post e imagens, desfaz se falhar), `removerPost` |
 | `src/services/galeriaService.ts` | `listarFotos`, `enviarFoto`, `removerFoto` |
-| `src/views/PostsPage.vue` | lista de posts com fotos e modal de novo post (texto, evento opcional, até 4 fotos); apaga o próprio post, e a comissão apaga qualquer um |
+| `src/composables/useFeed.ts` | feed de posts compartilhado pela Home (3 posts) e pela página Posts (30): carregar, curtir com atualização imediata na tela e desfeita se falhar, apagar com confirmação |
+| `src/services/curtidaService.ts` | `curtir` e `descurtir` (ignora o erro de curtida duplicada, `23505`) |
+| `src/services/nome.ts` | `nomeBonito` (primeira letra maiúscula, "de/da/do" em minúscula) e `inicialDoNome` |
+| `src/components/CartaoPost.vue` | cartão de post estilo rede social: avatar, nome com selo de comissão, "há 5 h", evento, texto, grade de fotos e coração com contagem |
+| `src/components/AvatarUsuario.vue` | foto de perfil redonda, ou a inicial do nome sobre fundo vinho quando não há foto |
+| `src/components/BarraNovoPost.vue` | barra "Compartilhe um momento com a turma…" que abre o modal de novo post |
+| `src/components/NovoPostModal.vue` | modal de novo post (texto, evento opcional, até 4 fotos), usado pela Home e pela página Posts |
+| `src/views/PostsPage.vue` | feed completo de posts (30 mais recentes) |
 | `src/views/GaleriaPage.vue` | fotos com legenda "Turma - Turma de ANO", modal de envio (foto, turma, ano, legenda, evento opcional); mesma regra de apagar |
 | `src/views/RecuperarSenhaPage.vue` | recuperação de senha em duas etapas: pede o e-mail e depois código + nova senha |
 | `src/services/anuncioService.ts` | `listarAnuncios` (fixados primeiro, depois os mais novos), `publicarAnuncio`, `alternarFixado`, `removerAnuncio` |
@@ -227,6 +234,7 @@ Migrações, aplicadas no servidor e versionadas em `supabase/migrations/`:
 | `...0005_codigo_comissao.sql` | tabela de códigos + gatilho que concede `is_admin` |
 | `...0006_nome_usuario_completo.sql` | afrouxa o `check` de `nome_usuario` para caber nome completo |
 | `...0007_storage_comissao_apaga.sql` | a comissão também pode apagar arquivos de imagem enviados por outras pessoas (antes só o dono). **Precisa ser executada no SQL Editor** |
+| `...0008_limpar_curtidas.sql` | gatilhos que apagam as curtidas de um post, foto ou anúncio quando ele é apagado (a tabela `curtida` não tem chave estrangeira para o alvo). **Precisa ser executada no SQL Editor**; sem ela as curtidas ficam órfãs, sem aparecer em lugar nenhum |
 
 ### Configuração do painel (não é migração)
 
@@ -692,13 +700,15 @@ Faltam requisitos para notificações, curtidas, obrigatoriedade da descrição 
 13. **A recuperação de senha é por código de 6 dígitos enviado por e-mail, não por link.** Fluxo: `resetPasswordForEmail(email)` → o aluno digita o código no app → `verifyOtp({ email, token, type: 'recovery' })` cria a sessão → `updateUser({ password })` grava a nova senha. Motivo: num app Capacitor um link abriria o navegador do celular, não o app, e exigiria deep link. Requer que o template **Reset Password** do Supabase mostre `{{ .Token }}` (ver a seção de configuração do painel). A resposta é a mesma exista ou não conta com o e-mail, para não revelar quem tem cadastro.
 14. **Fotos: até 4 por post, redimensionadas na captura** (`width: 1000`, `quality: 85`), enviadas ao Storage com o caminho `{id_do_usuario}/{timestamp}-{sufixo}.jpg`. Se o envio de uma foto, a criação do post ou o registro das imagens falhar, o que já foi enviado é desfeito. Isso é feito no cliente, em chamadas separadas, porque o supabase-js não tem transação — pode sobrar um arquivo órfão se a rede cair no meio do desfazer.
 15. **Posts e fotos da galeria podem ser apagados pelo dono e pela comissão.** O banco confirma a exclusão: se a RLS recusar, o serviço avisa em vez de fingir que apagou.
-16. **Curtidas ainda não existem na interface**, embora a tabela esteja pronta. Ficam para quando as notificações forem feitas, porque apagar um post precisa limpar também as curtidas dele.
+16. **Curtidas existem só para posts**, na Home e na página Posts. Fotos da galeria e anúncios ainda não têm coração, embora a tabela e o gatilho de limpeza já os considerem. A curtida não gera notificação ainda (etapa 9). Não há comentários: a tabela não existe.
 
 17. **Na galeria, a legenda fica sobre a foto**, em branco com sombra e um degradê escuro embaixo, para ler bem em qualquer imagem. A foto tem altura fixa de 320px e é cortada para preencher (`object-fit: cover`, aplicado pela `::part(image)` do `ion-img`, porque `object-fit` no próprio `ion-img` não atinge a imagem interna). O mesmo corte vale para a grade dos posts.
 18. **A Home mostra o Quadro de anúncios** com os 2 avisos mais recentes (fixados primeiro) e o link "Ver tudo". Anúncio automático de retirada (RF010) ainda não existe.
 19. **O perfil mostra os dados da conta sem permitir editá-los**: nome e e-mail são só leitura (a RLS também só libera `nome_usuario`, `nome` e `foto_perfil` para atualização, nunca `is_admin`). O que o usuário altera é a **foto** e a **senha**. A foto aparece também no ícone de perfil do cabeçalho.
 20. **A senha é trocada dentro do app confirmando a senha atual**: o app confere a atual com `signInWithPassword` e só então chama `updateUser({ password })`. Assim uma pessoa com o celular desbloqueado não troca a senha sem conhecê-la, e não gasta e-mail (o limite do SMTP é baixo). O fluxo por código de e-mail continua só para quem esqueceu a senha.
 21. **Diálogos e action sheets têm fundo branco e texto escuro**, definidos em `src/theme/variables.css`. O fundo geral do tema é `#bd9cad`, e os overlays o herdavam, deixando os botões rosa quase invisíveis. A variável `--ion-overlay-background-color` troca o fundo, e os seletores de texto precisam de mais especificidade que os do Ionic. Diálogos de apagar usam `cssClass: 'alerta-perigo'`, que deixa o botão Apagar vermelho.
+22. **As telas de lista recarregam toda vez que voltam a aparecer**, com `onIonViewWillEnter`, e não só quando são criadas (`onMounted`). O Ionic mantém as telas em memória ao navegar; com `onMounted` a Home continuava mostrando um anúncio já apagado. Vale para toda tela nova que leia dados.
+23. **A Home tem a seção "Atualizações"**: barra de novo post, os 3 posts mais recentes e o botão VER TODOS OS POSTS. A ordem da Home é saldo, quadro de anúncios, atualizações e atalhos.
 
 ---
 

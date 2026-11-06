@@ -135,7 +135,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
+import { onIonViewWillEnter } from '@ionic/vue'
 import {
   IonButton,
   IonContent,
@@ -202,7 +203,7 @@ const erroDescricao = computed(() => {
 
 const formularioValido = computed(() => !erroValor.value && !erroDescricao.value)
 
-onMounted(async () => {
+onIonViewWillEnter(async () => {
   caixa.carregarExtrato()
   try {
     eventos.value = await listarEventos()
