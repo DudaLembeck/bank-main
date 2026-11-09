@@ -57,6 +57,7 @@
         </ion-list>
       </div>
 
+      <div class="ancora-modal">
       <ion-modal :is-open="modalAberto" @did-dismiss="fecharLancamento">
         <ion-content class="fundo">
           <TituloSecao
@@ -130,6 +131,7 @@
           </CartaoFormulario>
         </ion-content>
       </ion-modal>
+      </div>
     </ion-content>
   </ion-page>
 </template>

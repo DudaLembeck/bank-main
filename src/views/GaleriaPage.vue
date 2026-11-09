@@ -53,6 +53,7 @@
         </ion-card>
       </template>
 
+      <div class="ancora-modal">
       <ion-modal :is-open="modalAberto" @did-dismiss="fecharEnvio">
         <ion-content class="fundo">
           <TituloSecao texto="Enviar foto" />
@@ -145,6 +146,7 @@
           </CartaoFormulario>
         </ion-content>
       </ion-modal>
+      </div>
     </ion-content>
   </ion-page>
 </template>
@@ -282,7 +284,10 @@ async function enviar() {
   tocado.value = true
   erroGeral.value = ''
   if (erroFoto.value || erroAno.value) return
-  if (!usuario.perfil || !fotoEscolhida.value) return
+  if (!usuario.perfil || !fotoEscolhida.value) {
+    erroGeral.value = 'Sua sessão não carregou. Saia e entre de novo.'
+    return
+  }
 
   enviando.value = true
   try {

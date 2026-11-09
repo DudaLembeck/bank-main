@@ -76,6 +76,7 @@
         SAIR
       </ion-button>
 
+      <div class="ancora-modal">
       <ion-modal :is-open="modalSenha" @did-dismiss="fecharSenha">
         <ion-content class="fundo">
           <TituloSecao texto="Redefinir senha" />
@@ -145,6 +146,7 @@
           </CartaoFormulario>
         </ion-content>
       </ion-modal>
+      </div>
     </ion-content>
   </ion-page>
 </template>

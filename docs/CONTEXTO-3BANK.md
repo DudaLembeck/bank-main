@@ -744,5 +744,8 @@ Faltam requisitos para notificações, curtidas, obrigatoriedade da descrição 
 - Todo `await supabase...` trata o `error` e mostra mensagem ao usuário.
 - Nomes de variáveis, funções, colunas e rotas em português.
 - Cada tela nova precisa ser registrada em `src/router/index.ts`.
+- **Todo `<ion-modal>` inline vai dentro de `<div class="ancora-modal">`**, e um componente cujo único conteúdo é um modal também precisa dessa `div` como raiz. Ao abrir, o Ionic tira o `ion-modal` do lugar; se o Vue usar esse modal como ponto de referência para inserir itens de uma lista logo antes dele, dá `insertBefore ... is not a child of this node`, a página para de renderizar e a navegação trava (a URL muda, mas a tela não). A `div` é o ponto de referência que nunca se move.
+- **Não usar `ion-title` com `width`/`flex` customizados em cabeçalhos.** No iPhone (modo iOS) o Ionic centraliza o `ion-title` em cima de toda a barra, e o "3BANK" passou por cima dos ícones. Para a marca no canto, usar um elemento comum com `slot="end"`. Testar cabeçalhos nos dois modos: o navegador usa o modo Android (`md`), e `?ionic:mode=ios` na URL força o do iPhone.
+- Botões que dependem de `usuario.perfil` não podem sair em silêncio quando ele não carregou: mostrar "Sua sessão não carregou. Saia e entre de novo.".
 - Toda regra de permissão existe no banco (RLS/função); a interface apenas esconde o que não se pode fazer.
 - Rodar `npm run lint` e `npm run build` depois de mexer em código, e relatar o resultado real.

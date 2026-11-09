@@ -73,6 +73,7 @@
         </p>
       </template>
 
+      <div class="ancora-modal">
       <ion-modal :is-open="modalAberto" @did-dismiss="fecharNovo">
         <ion-content class="fundo">
           <TituloSecao texto="Novo anúncio" />
@@ -140,6 +141,7 @@
           </CartaoFormulario>
         </ion-content>
       </ion-modal>
+      </div>
     </ion-content>
   </ion-page>
 </template>
@@ -258,7 +260,11 @@ async function avisarErro(e: unknown, padrao: string) {
 async function publicar() {
   tocado.value = true
   erroGeral.value = ''
-  if (erroTexto.value || !usuario.perfil) return
+  if (erroTexto.value) return
+  if (!usuario.perfil) {
+    erroGeral.value = 'Sua sessão não carregou. Saia e entre de novo.'
+    return
+  }
 
   publicando.value = true
   try {

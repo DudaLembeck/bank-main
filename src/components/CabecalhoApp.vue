@@ -16,7 +16,7 @@
         <strong class="nome">{{ nomeFormatado }}</strong>
       </div>
 
-      <ion-title slot="end">3BANK</ion-title>
+      <span slot="end" class="marca">3BANK</span>
     </ion-toolbar>
   </ion-header>
 </template>
@@ -27,7 +27,6 @@ import {
   IonButtons,
   IonHeader,
   IonIcon,
-  IonTitle,
   IonToolbar,
   useIonRouter
 } from '@ionic/vue'
@@ -113,9 +112,8 @@ ion-icon {
   overflow: hidden;
 }
 
-ion-title {
-  flex: 0 0 auto;
-  width: auto;
+.marca {
+  flex: none;
   padding: 0 14px 0 6px;
   font-size: 17px;
   font-weight: 800;

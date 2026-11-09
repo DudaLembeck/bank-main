@@ -1,4 +1,5 @@
 <template>
+  <div class="ancora-modal">
   <ion-modal :is-open="aberto" @did-dismiss="emit('fechar')">
     <ion-content class="fundo">
       <TituloSecao texto="Novo post" />
@@ -77,6 +78,7 @@
       </CartaoFormulario>
     </ion-content>
   </ion-modal>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -154,7 +156,11 @@ function tirarFoto(indice: number) {
 async function publicar() {
   tocado.value = true
   erroGeral.value = ''
-  if (erroTexto.value || !usuario.perfil) return
+  if (erroTexto.value) return
+  if (!usuario.perfil) {
+    erroGeral.value = 'Sua sessão não carregou. Saia e entre de novo.'
+    return
+  }
 
   publicando.value = true
   try {
